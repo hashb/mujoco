@@ -54,6 +54,8 @@ set_property(CACHE MUJOCO_USD_TARGET
 )
 
 if (EMSCRIPTEN)
+  # set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_LIBDIR}")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Installation prefix" FORCE)
   add_compile_options(-Wno-deprecated-literal-operator)
 endif()
 
