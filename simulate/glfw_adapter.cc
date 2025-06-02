@@ -18,6 +18,8 @@
 #include <utility>
 
 #include <GLFW/glfw3.h>
+#include <GLFW/emscripten_glfw3.h>
+#include <emscripten/emscripten.h>
 #include <mujoco/mjui.h>
 #include <mujoco/mujoco.h>
 #include "glfw_dispatch.h"
@@ -28,9 +30,17 @@
 
 namespace mujoco {
 namespace {
+
+void consoleErrorHandler(int iErrorCode, char const *iErrorMessage)
+{
+  printf("glfwError: %d | %s\n", iErrorCode, iErrorMessage);
+}
+
 int MaybeGlfwInit() {
   static const int is_initialized = []() {
+    printf("%s\n", glfwGetVersionString());
     auto success = Glfw().glfwInit();
+    printf("success: %d\n", success);
     if (success == GLFW_TRUE) {
       std::atexit(Glfw().glfwTerminate);
     }
@@ -45,9 +55,19 @@ GlfwAdapter& GlfwAdapterFromWindow(GLFWwindow* window) {
 }  // namespace
 
 GlfwAdapter::GlfwAdapter() {
+  // set a callback for errors otherwise if there is a problem, we won't know
+  glfwSetErrorCallback(consoleErrorHandler);
+  printf("error callback set\n");
+
   if (MaybeGlfwInit() != GLFW_TRUE) {
     mju_error("could not initialize GLFW");
   }
+
+  // no OpenGL (use canvas2D)
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+  // setting the association window <-> canvas
+  emscripten_glfw_set_next_window_canvas_selector("#canvas");
 
   // multisampling
   Glfw().glfwWindowHint(GLFW_SAMPLES, 4);
@@ -56,40 +76,51 @@ GlfwAdapter::GlfwAdapter() {
   // get video mode and save
   vidmode_ = *Glfw().glfwGetVideoMode(Glfw().glfwGetPrimaryMonitor());
 
+  printf("vidmode: %d, %d\n", vidmode_.width, vidmode_.height);
+
   // create window
-  window_ = Glfw().glfwCreateWindow((2 * vidmode_.width) / 3,
-                                    (2 * vidmode_.height) / 3,
+  window_ = Glfw().glfwCreateWindow(640, 480,
                                     "MuJoCo", nullptr, nullptr);
+  printf("window created\n");
   if (!window_) {
     mju_error("could not create window");
   }
 
+  printf("0\n");
   // save window position and size
   Glfw().glfwGetWindowPos(window_, &window_pos_.first, &window_pos_.second);
   Glfw().glfwGetWindowSize(window_, &window_size_.first, &window_size_.second);
 
+  printf("1\n");
+
   // set callbacks
   Glfw().glfwSetWindowUserPointer(window_, this);
+  printf("2\n");
   Glfw().glfwSetDropCallback(
       window_, +[](GLFWwindow* window, int count, const char** paths) {
         GlfwAdapterFromWindow(window).OnFilesDrop(count, paths);
       });
+  printf("3\n");
   Glfw().glfwSetKeyCallback(
       window_, +[](GLFWwindow* window, int key, int scancode, int act, int mods) {
         GlfwAdapterFromWindow(window).OnKey(key, scancode, act);
       });
+  printf("4\n");
   Glfw().glfwSetMouseButtonCallback(
       window_, +[](GLFWwindow* window, int button, int act, int mods) {
         GlfwAdapterFromWindow(window).OnMouseButton(button, act);
       });
+  printf("5\n");
   Glfw().glfwSetCursorPosCallback(
       window_, +[](GLFWwindow* window, double x, double y) {
         GlfwAdapterFromWindow(window).OnMouseMove(x, y);
       });
+  printf("6\n");
   Glfw().glfwSetScrollCallback(
       window_, +[](GLFWwindow* window, double xoffset, double yoffset) {
         GlfwAdapterFromWindow(window).OnScroll(xoffset, yoffset);
       });
+  printf("7\n");
   Glfw().glfwSetWindowRefreshCallback(
       window_, +[](GLFWwindow* window) {
 #ifdef __APPLE__
@@ -100,13 +131,15 @@ GlfwAdapter::GlfwAdapter() {
 #endif
         GlfwAdapterFromWindow(window).OnWindowRefresh();
       });
+  printf("8\n");
   Glfw().glfwSetWindowSizeCallback(
       window_, +[](GLFWwindow* window, int width, int height) {
         GlfwAdapterFromWindow(window).OnWindowResize(width, height);
       });
-
+  printf("9\n");
   // make context current
   Glfw().glfwMakeContextCurrent(window_);
+  printf("10\n");
 }
 
 GlfwAdapter::~GlfwAdapter() {
