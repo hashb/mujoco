@@ -509,18 +509,19 @@ int main(int argc, char** argv) {
       std::make_unique<mj::GlfwAdapter>(),
       &cam, &opt, &pert, /* is_passive = */ false
   );
+  printf("sim created\n");
 
-  const char* filename = nullptr;
-  if (argc >  1) {
-    filename = argv[1];
-  }
+  // const char* filename = nullptr;
+  // if (argc >  1) {
+  //   filename = argv[1];
+  // }
 
   // start physics thread
-  std::thread physicsthreadhandle(&PhysicsThread, sim.get(), filename);
+  // std::thread physicsthreadhandle(&PhysicsThread, sim.get(), filename);
 
   // start simulation UI loop (blocking call)
   sim->RenderLoop();
-  physicsthreadhandle.join();
+  // physicsthreadhandle.join();
 
   return 0;
 }

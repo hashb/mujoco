@@ -1538,15 +1538,15 @@ void mjr_makeContext_offSize(const mjModel* m, mjrContext* con, int fontscale,
     if (!mjGladLoadGL()) {
       mju_error("gladLoadGL error");
     }
-    if (!mjGLAD_GL_VERSION_1_5) {
-      mju_error("OpenGL version 1.5 or higher required");
-    }
-    if (!mjGLAD_GL_ARB_framebuffer_object) {
-      mju_error("OpenGL ARB_framebuffer_object required");
-    }
-    if (!mjGLAD_GL_ARB_vertex_buffer_object) {
-      mju_error("OpenGL ARB_vertex_buffer_object required");
-    }
+    // if (!mjGLAD_GL_VERSION_1_5) {
+    //   mju_error("OpenGL version 1.5 or higher required");
+    // }
+    // if (!mjGLAD_GL_ARB_framebuffer_object) {
+    //   mju_error("OpenGL ARB_framebuffer_object required");
+    // }
+    // if (!mjGLAD_GL_ARB_vertex_buffer_object) {
+    //   mju_error("OpenGL ARB_vertex_buffer_object required");
+    // }
     con->glInitialized = 1;
 
     // determine window availability (could be EGL-headless)

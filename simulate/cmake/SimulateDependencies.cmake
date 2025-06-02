@@ -27,10 +27,10 @@ option(MUJOCO_SIMULATE_USE_SYSTEM_MUJOCO "Use installed MuJoCo version."
 unset(DEFAULT_USE_SYSTEM_MUJOCO)
 
 option(MUJOCO_SIMULATE_USE_SYSTEM_MUJOCO "Use installed MuJoCo version." OFF)
-option(MUJOCO_SIMULATE_USE_SYSTEM_GLFW "Use installed GLFW version." OFF)
+option(MUJOCO_SIMULATE_USE_SYSTEM_GLFW "Use installed GLFW version." ON)
 
 set(MUJOCO_DEP_VERSION_glfw3
-    7482de6071d21db77a7236155da44c172a7f6c9e # 3.3.8
+    994963a54b6717488719d936ad3687bb41519877 # 3.3.8
     CACHE STRING "Version of `glfw` to be fetched."
 )
 mark_as_advanced(MUJOCO_DEP_VERSION_glfw3)
@@ -74,21 +74,21 @@ set(GLFW_BUILD_TESTS OFF)
 set(GLFW_BUILD_DOCS OFF)
 set(GLFW_INSTALL OFF)
 
-findorfetch(
-  USE_SYSTEM_PACKAGE
-  MUJOCO_SIMULATE_USE_SYSTEM_GLFW
-  PACKAGE_NAME
-  glfw3
-  LIBRARY_NAME
-  glfw3
-  GIT_REPO
-  https://github.com/glfw/glfw.git
-  GIT_TAG
-  ${MUJOCO_DEP_VERSION_glfw3}
-  TARGETS
-  glfw
-  EXCLUDE_FROM_ALL
-)
+# findorfetch(
+#   USE_SYSTEM_PACKAGE
+#   MUJOCO_SIMULATE_USE_SYSTEM_GLFW
+#   PACKAGE_NAME
+#   glfw3
+#   LIBRARY_NAME
+#   glfw3
+#   GIT_REPO
+#   https://github.com/pongasoft/emscripten-glfw.git
+#   GIT_TAG
+#   ${MUJOCO_DEP_VERSION_glfw3}
+#   TARGETS
+#   glfw
+#   EXCLUDE_FROM_ALL
+# )
 
 if(MUJOCO_EXTRAS_STATIC_GLFW)
   set(BUILD_SHARED_LIBS
@@ -99,6 +99,15 @@ if(MUJOCO_EXTRAS_STATIC_GLFW)
 endif()
 
 if(NOT SIMULATE_STANDALONE)
-  target_compile_options(glfw PRIVATE ${MUJOCO_MACOS_COMPILE_OPTIONS})
-  target_link_options(glfw PRIVATE ${MUJOCO_MACOS_LINK_OPTIONS})
+  if(EMSCRIPTEN)
+    # When using Emscripten, add the contrib.glfw3 port directly to the compiler and linker flags
+    add_compile_options("--use-port=contrib.glfw3")
+    add_link_options("--use-port=contrib.glfw3")
+  else()
+    # For non-Emscripten builds, apply options to the glfw target if it exists
+    if(TARGET glfw)
+      target_compile_options(glfw PRIVATE ${MUJOCO_MACOS_COMPILE_OPTIONS})
+      target_link_options(glfw PRIVATE ${MUJOCO_MACOS_LINK_OPTIONS})
+    endif()
+  endif()
 endif()
