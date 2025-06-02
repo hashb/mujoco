@@ -41,7 +41,7 @@ enable_language(CXX)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 option(MUJOCO_BUILD_EXAMPLES "Build samples for MuJoCo" OFF)
-option(MUJOCO_BUILD_SIMULATE "Build simulate library for MuJoCo" OFF)
+option(MUJOCO_BUILD_SIMULATE "Build simulate library for MuJoCo" ON)
 option(MUJOCO_BUILD_TESTS "Build tests for MuJoCo" OFF)
 option(MUJOCO_TEST_PYTHON_UTIL "Build and test utility libraries for Python bindings" OFF)
 option(MUJOCO_BUILD_USD_PLUGINS "Build OpenUSD plugins" OFF)
@@ -55,7 +55,7 @@ set_property(CACHE MUJOCO_USD_TARGET
 
 if (EMSCRIPTEN)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Installation prefix" FORCE)
-  add_compile_options(-Wno-deprecated-literal-operator)
+  add_compile_options(-Wno-deprecated-literal-operator -Wno-unused-function -Wno-error=unused-function)
 endif()
 
 if(APPLE AND (MUJOCO_BUILD_EXAMPLES OR MUJOCO_BUILD_SIMULATE))

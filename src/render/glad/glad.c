@@ -1491,6 +1491,9 @@ static void mjGlad_find_coreGL(void) {
 }
 
 int mjGladLoadGLUnsafe(void) {
+#if defined(__EMSCRIPTEN__)
+  return 1;
+#else
   if (mjGlad_open_gl()) {
     mjGLVersion.major = 0; mjGLVersion.minor = 0;
     glGetString = (PFNGLGETSTRINGPROC)mjGlad_get_proc("glGetString");
@@ -1515,6 +1518,7 @@ int mjGladLoadGLUnsafe(void) {
   } else {
     return 0;
   }
+#endif // __EMSCRIPTEN__
 }
 
 #if defined(__GNUC__) && !defined(__clang__)

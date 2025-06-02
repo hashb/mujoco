@@ -113,10 +113,10 @@ if(APPLE)
   set_source_files_properties(glfw_corevideo.mm PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
   target_link_libraries(platform_ui_adapter PUBLIC "-framework CoreVideo")
 endif()
-target_include_directories(
-  platform_ui_adapter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-                             $<TARGET_PROPERTY:glfw,INTERFACE_INCLUDE_DIRECTORIES>
-)
+# target_include_directories(
+#   platform_ui_adapter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+#                              $<TARGET_PROPERTY:glfw,INTERFACE_INCLUDE_DIRECTORIES>
+# )
 target_link_libraries(platform_ui_adapter PUBLIC mujoco::mujoco)
 if(SIMULATE_GLFW_DYNAMIC_SYMBOLS)
   target_compile_definitions(platform_ui_adapter PUBLIC mjGLFW_DYNAMIC_SYMBOLS)
