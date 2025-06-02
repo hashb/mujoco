@@ -1492,7 +1492,7 @@ static void mjGlad_find_coreGL(void) {
 
 int mjGladLoadGLUnsafe(void) {
 #if defined(__EMSCRIPTEN__)
-  return 0;
+  return 0==0;
 #else
   if (mjGlad_open_gl()) {
     mjGLVersion.major = 0; mjGLVersion.minor = 0;
